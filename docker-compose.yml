@@ -1,0 +1,14 @@
+version: '3'
+services:
+  db:
+    image: 'postgres:13.1-alpine'
+    container_name: db
+    env_file:
+      - .env
+    volumes:
+      - db_data:/var/lib/postgres
+    ports:
+      - "5432:5432"
+
+volumes:
+  db_data:
