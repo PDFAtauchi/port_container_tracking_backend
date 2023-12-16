@@ -58,8 +58,8 @@ Thus, in this project we will focus on the **container management**, specificall
 1. DataBase decisions:
     1. Feature 1: Register a container:
         1. Considering the traffic to create records of containers, the best choice is use an SQL database.
-    1. Feature 2: List all available containers.
-        1. Considering the traffic to create records of containers, the best choice is use an SQL database.
+    1. Feature 2: get container detail.
+        1. Considering the traffic to retrieve records of containers, the best choice is use an SQL database.
 1. Stack decision:
     1. Backend:
         1. Options available: (Java, Python, .NET)
@@ -95,14 +95,68 @@ Thus, in this project we will focus on the **container management**, specificall
 After run access to (http://localhost:8080/api-route)
 ### API usage
 #### API create container
-POST
+POST 201 Created
 ```
+localhost:8080/container/api/v1/create
+Request
 {
+    "code": "ABC",
+    "status": "CUSTOMS_CLEARANCE"
+}
+
+Response
+{
+    "id": 1,
+    "code": "ABC",
+    "status": "CUSTOMS_CLEARANCE"
+}
+```
+
+POST 400 Bad Request
+```
+localhost:8080/container/api/v1/create
+Request
+{
+    "code": "ABC",
+    "status": "other"
+}
+
+Response
+{
+    "timestamp": "...",
+    "status": 400,
+    "error": "Bad Request",
+    "message": "...",
+    "path": "..."
 }
 ```
 
 #### API get detail container
-GET
+GET 200 Ok
+```
+exist container id
+
+Request
+localhost:8080/container/api/v1/detail/1
+
+
+Response
+{
+    "id": 1,
+    "code": "ABC",
+    "status": "CUSTOMS_CLEARANCE"
+}
+```
+
+GET 404 Not Found
+```
+no exist container id
+
+Request
+localhost:8080/container/api/v1/detail/1
+
+Response: 404 Not Found
+```
 
 ### To Run Test
 ```sh
