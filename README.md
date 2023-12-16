@@ -87,6 +87,13 @@ Thus, in this project we will focus on the **container management**, specificall
 - pre-commit install --hook-type commit-msg
 - clone the repo
 
+### Additional
+- create .env file in root of project, used in docker-compose.yaml
+```yaml
+POSTGRES_DB=db-name
+POSTGRES_USER=user-name
+POSTGRES_PASSWORD=db-password
+```
 ### To Run project
 #### Local
 ```sh
@@ -167,3 +174,24 @@ Response: 404 Not Found
 ```
 path: build/reports/jacoco/test/html/index.html
 ```
+
+
+
+### Stack
+- Sprint boot
+- Postgresql
+- Mockito
+- Junit
+- Jacoco
+- Testcontainer
+- Instancio
+- Spotless
+- docker-compose
+
+
+### Improvements
+- Implement the Update and delete container API
+- Add logging for logs
+- Configuration of features flags
+- Monitor the app with Grafana and Prometheus
+- Use SonarQube in a collaborative quality code way.
