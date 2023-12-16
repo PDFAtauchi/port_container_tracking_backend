@@ -68,7 +68,7 @@ public class ContainerControllerTests {
         // Then
         response.andExpect(status().isCreated())
                 .andExpect(jsonPath("$.code", is(container.getCode())))
-                .andExpect(jsonPath("$.status", is(container.getStatus())));
+                .andExpect(jsonPath("$.status", is(container.getStatus().toString())));
     }
 
     @Test

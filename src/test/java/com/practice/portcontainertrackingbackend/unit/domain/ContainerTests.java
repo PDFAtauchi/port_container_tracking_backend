@@ -3,6 +3,7 @@ package com.practice.portcontainertrackingbackend.unit.domain;
 import static org.assertj.core.api.Assertions.*;
 
 import com.practice.portcontainertrackingbackend.domain.Container;
+import com.practice.portcontainertrackingbackend.domain.ContainerStatus;
 import org.junit.jupiter.api.Test;
 
 public class ContainerTests {
@@ -12,7 +13,7 @@ public class ContainerTests {
         // Given
         int id = 1;
         String code = "ABC";
-        String status = "UNLOADING";
+        ContainerStatus status = ContainerStatus.UNLOADING;
 
         // When
         Container container =

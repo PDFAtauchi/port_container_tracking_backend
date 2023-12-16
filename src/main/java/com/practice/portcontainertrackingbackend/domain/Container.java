@@ -21,5 +21,6 @@ public class Container {
     private String code;
 
     @Column(name = "status", nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private ContainerStatus status;
 }
