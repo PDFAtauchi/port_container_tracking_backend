@@ -68,10 +68,10 @@ public class ContainerRepositoryTests {
     @Test
     public void should_retrieve_empty_when_object_does_not_exist() {
         // Given
-        int idInexistentContainer = 1;
+        int idNonexistentContainer = 1;
 
         // When
-        Optional<Container> containerRetrieved = containerRepository.findById(idInexistentContainer);
+        Optional<Container> containerRetrieved = containerRepository.findById(idNonexistentContainer);
 
         // Then
         assertThat(containerRetrieved).isEmpty();

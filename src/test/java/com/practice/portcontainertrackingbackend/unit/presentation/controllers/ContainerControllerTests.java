@@ -72,7 +72,7 @@ public class ContainerControllerTests {
     }
 
     @Test
-    public void should_return_404_bad_request_when_create_invalid_object() throws Exception {
+    public void should_return_400_bad_request_when_create_invalid_object() throws Exception {
         // Given
         given(containerService.createContainer(any(Container.class))).willThrow(new RuntimeException("Error"));
 
@@ -85,7 +85,7 @@ public class ContainerControllerTests {
     }
 
     @Test
-    public void should_return_object_when_object_exists() throws Exception {
+    public void should_return_200_ok_when_object_exists() throws Exception {
         // Given
         int containerId = 1;
         container.setId(containerId);
@@ -105,9 +105,8 @@ public class ContainerControllerTests {
         assertThat(containerRetrieved.getStatus()).isEqualTo(container.getStatus());
     }
 
-    // TODO: return 404 not found when object does not exist
     @Test
-    public void should_return_200_object_when_object_exists() throws Exception {
+    public void should_return_404_not_found_when_object_does_not_exists() throws Exception {
         // Given
         int containerId = 1;
         given(containerService.getContainer(containerId)).willReturn(Optional.empty());
