@@ -7,9 +7,11 @@ import static org.mockito.Mockito.*;
 import com.practice.portcontainertrackingbackend.application.ContainerServiceImpl;
 import com.practice.portcontainertrackingbackend.domain.Container;
 import com.practice.portcontainertrackingbackend.domain.repositories.ContainerRepository;
+import java.util.List;
 import java.util.Optional;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -92,5 +94,37 @@ public class ContainerServiceTests {
         // Then
         verify(containerRepository, times(1)).findById(containerId);
         assertThat(containerRetrieved).isEmpty();
+    }
+
+    @Nested
+    class ListContainer {
+        @Test
+        void shouldReturnContainers_WhenContainersInDB() {
+            // Given
+            Container container2 = generateContainer();
+            List<Container> containers = List.of(container, container2);
+
+            given(containerRepository.findAll()).willReturn(containers);
+
+            // When
+            List<Container> retrieveContainers = containerService.getAllContainers();
+
+            // Then
+            verify(containerRepository, times(1)).findAll();
+            assertThat(retrieveContainers).hasSize(2);
+        }
+
+        @Test
+        void shouldReturnNoContainers_WhenNoContainersInDB() {
+            // Given
+            given(containerRepository.findAll()).willReturn(List.of());
+
+            // When
+            List<Container> retrieveContainers = containerService.getAllContainers();
+
+            // Then
+            verify(containerRepository, times(1)).findAll();
+            assertThat(retrieveContainers).isEmpty();
+        }
     }
 }
