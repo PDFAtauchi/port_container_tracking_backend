@@ -30,8 +30,7 @@ public class ContainerServiceTests {
     private Container container;
 
     private Container generateContainer() {
-        Container container = Instancio.create(Container.class);
-        return container;
+        return Instancio.create(Container.class);
     }
 
     @BeforeEach
@@ -39,67 +38,74 @@ public class ContainerServiceTests {
         container = generateContainer();
     }
 
-    @Test
-    public void should_create_object_when_valid_object() {
-        // Given
-        Container mockContainer = container.withId(1);
+    @Nested
+    class CreateContainer {
+        @Test
+        void shouldCreateValidObjectSuccessfully() {
+            // Given
+            Container mockContainer = container.withId(1);
 
-        given(containerRepository.save(container)).willReturn(mockContainer);
+            given(containerRepository.save(container)).willReturn(mockContainer);
 
-        // When
-        Container containerSaved = containerService.createContainer(container);
+            // When
+            Container containerSaved = containerService.createContainer(container);
 
-        // Then
-        verify(containerRepository, times(1)).save(container);
-        assertThat(containerSaved.getId()).isEqualTo(mockContainer.getId());
+            // Then
+            verify(containerRepository, times(1)).save(container);
+            assertThat(containerSaved.getId()).isEqualTo(mockContainer.getId());
+        }
+
+        @Test
+        void shouldThrowExceptionForInvalidObject() {
+            // Given invalid object
+            given(containerRepository.save(container)).willThrow(RuntimeException.class);
+
+            // When createContainer
+
+            // Then
+            assertThatThrownBy(() -> containerRepository.save(container)).isInstanceOf(RuntimeException.class);
+            verify(containerRepository, times(1)).save(container);
+        }
     }
 
-    @Test
-    public void should_throw_exception_when_invalid_object() {
-        // Given invalid object
-        given(containerRepository.save(container)).willThrow(RuntimeException.class);
+    @Nested
+    class RetrieveContainer {
+        @Test
+        void shouldRetrieveObjectIfExists() {
+            // Given
+            int containerId = 1;
+            Container mockContainer = container.withId(containerId);
+            given(containerRepository.findById(containerId)).willReturn(Optional.of(mockContainer));
 
-        // When createContainer
+            // When
+            Optional<Container> containerRetrieved = containerService.getContainer(containerId);
 
-        // Then
-        assertThatThrownBy(() -> containerRepository.save(container)).isInstanceOf(RuntimeException.class);
-        verify(containerRepository, times(1)).save(container);
-    }
+            // Then
+            verify(containerRepository, times(1)).findById(containerId);
+            assertThat(containerRetrieved).isPresent();
+            assertThat(containerRetrieved.get()).isNotNull();
+            assertThat(containerRetrieved.get().getId()).isEqualTo(containerId);
+        }
 
-    @Test
-    public void should_retrieve_object_when_object_exist() {
-        // Given
-        int containerId = 1;
-        Container mockContainer = container.withId(containerId);
-        given(containerRepository.findById(containerId)).willReturn(Optional.of(mockContainer));
+        @Test
+        void shouldRetrieveEmptyWhenObjectDoesNotExist() {
+            // Given
+            int containerId = 1;
+            given(containerRepository.findById(containerId)).willReturn(Optional.empty());
 
-        // When
-        Optional<Container> containerRetrieved = containerService.getContainer(containerId);
+            // When
+            Optional<Container> containerRetrieved = containerService.getContainer(containerId);
 
-        // Then
-        verify(containerRepository, times(1)).findById(containerId);
-        assertThat(containerRetrieved.get()).isNotNull();
-        assertThat(containerRetrieved.get().getId()).isEqualTo(containerId);
-    }
-
-    @Test
-    public void should_retrieve_empty_when_object_does_not_exist() {
-        // Given
-        int containerId = 1;
-        given(containerRepository.findById(containerId)).willReturn(Optional.empty());
-
-        // When
-        Optional<Container> containerRetrieved = containerService.getContainer(containerId);
-
-        // Then
-        verify(containerRepository, times(1)).findById(containerId);
-        assertThat(containerRetrieved).isEmpty();
+            // Then
+            verify(containerRepository, times(1)).findById(containerId);
+            assertThat(containerRetrieved).isEmpty();
+        }
     }
 
     @Nested
     class ListContainer {
         @Test
-        void shouldReturnContainers_WhenContainersInDB() {
+        void shouldReturnContainersWhenContainersExist() {
             // Given
             Container container2 = generateContainer();
             List<Container> containers = List.of(container, container2);
@@ -115,7 +121,7 @@ public class ContainerServiceTests {
         }
 
         @Test
-        void shouldReturnNoContainers_WhenNoContainersInDB() {
+        void shouldReturnNoContainersWhenNoContainersExist() {
             // Given
             given(containerRepository.findAll()).willReturn(List.of());
 

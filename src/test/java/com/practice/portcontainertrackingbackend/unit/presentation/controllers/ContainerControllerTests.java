@@ -46,8 +46,7 @@ public class ContainerControllerTests {
     private String serviceListUrl;
 
     public Container generateContainer() {
-        container = Instancio.create(Container.class);
-        return container;
+        return Instancio.create(Container.class);
     }
 
     @BeforeEach
@@ -58,69 +57,77 @@ public class ContainerControllerTests {
         serviceListUrl = Constants.BASE_URL + Constants.LIST_CONTAINER_URL;
     }
 
-    @Test
-    public void should_return_201_status_code_and_object_created_when_create_valid_object() throws Exception {
-        // Given
-        int containerId = 1;
-        container.setId(containerId);
-        given(containerService.createContainer(any(Container.class))).willAnswer(arguments -> arguments.getArgument(0));
+    @Nested
+    class CreateContainer {
+        @Test
+        void shouldCreateObjectSuccessfullyAndReturn201StatusCodeForValidInput() throws Exception {
+            // Given
+            int containerId = 1;
+            container.setId(containerId);
+            given(containerService.createContainer(any(Container.class)))
+                    .willAnswer(arguments -> arguments.getArgument(0));
 
-        // When
-        ResultActions response = mockMvc.perform(post(serviceCreateUrl)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(container)));
+            // When
+            ResultActions response = mockMvc.perform(post(serviceCreateUrl)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(container)));
 
-        // Then
-        response.andExpect(status().isCreated())
-                .andExpect(jsonPath("$.code", is(container.getCode())))
-                .andExpect(jsonPath("$.status", is(container.getStatus().toString())));
+            // Then
+            response.andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.code", is(container.getCode())))
+                    .andExpect(jsonPath("$.status", is(container.getStatus().toString())));
+        }
+
+        @Test
+        void shouldReturnBadRequest400WhenCreatingInvalidObject() throws Exception {
+            // Given
+            given(containerService.createContainer(any(Container.class))).willThrow(new RuntimeException("Error"));
+
+            // When
+            ResultActions response = mockMvc.perform(post(serviceCreateUrl)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(""));
+
+            // Then
+            response.andExpect(status().isBadRequest());
+        }
     }
 
-    @Test
-    public void should_return_400_bad_request_when_create_invalid_object() throws Exception {
-        // Given
-        given(containerService.createContainer(any(Container.class))).willThrow(new RuntimeException("Error"));
+    @Nested
+    class RetrieveContainer {
+        @Test
+        void shouldReturn200OkWhenObjectExists() throws Exception {
+            // Given
+            int containerId = 1;
+            container.setId(containerId);
+            given(containerService.getContainer(containerId)).willReturn(Optional.of(container));
 
-        // When
-        ResultActions response = mockMvc.perform(
-                post(serviceCreateUrl).contentType(MediaType.APPLICATION_JSON).content(""));
+            // When
+            ResultActions response = mockMvc.perform(get(serviceDetailUrl, containerId));
+            MvcResult result = response.andReturn();
 
-        // Then
-        response.andExpect(status().isBadRequest());
-    }
+            // Then
+            response.andExpect(status().isOk());
+            String responseData = result.getResponse().getContentAsString();
+            Container containerRetrieved = objectMapper.readValue(responseData, Container.class);
 
-    @Test
-    public void should_return_200_ok_when_object_exists() throws Exception {
-        // Given
-        int containerId = 1;
-        container.setId(containerId);
-        given(containerService.getContainer(containerId)).willReturn(Optional.of(container));
+            assertThat(containerRetrieved.getId()).isEqualTo(container.getId());
+            assertThat(containerRetrieved.getCode()).isEqualTo(container.getCode());
+            assertThat(containerRetrieved.getStatus()).isEqualTo(container.getStatus());
+        }
 
-        // When
-        ResultActions response = mockMvc.perform(get(serviceDetailUrl, containerId));
-        MvcResult result = response.andReturn();
+        @Test
+        void shouldReturn404NotFoundForNonexistentObject() throws Exception {
+            // Given
+            int containerId = 1;
+            given(containerService.getContainer(containerId)).willReturn(Optional.empty());
 
-        // Then
-        response.andExpect(status().isOk());
-        String responseData = result.getResponse().getContentAsString();
-        Container containerRetrieved = objectMapper.readValue(responseData, Container.class);
+            // When
+            ResultActions response = mockMvc.perform(get(serviceDetailUrl, containerId));
 
-        assertThat(containerRetrieved.getId()).isEqualTo(container.getId());
-        assertThat(containerRetrieved.getCode()).isEqualTo(container.getCode());
-        assertThat(containerRetrieved.getStatus()).isEqualTo(container.getStatus());
-    }
-
-    @Test
-    public void should_return_404_not_found_when_object_does_not_exists() throws Exception {
-        // Given
-        int containerId = 1;
-        given(containerService.getContainer(containerId)).willReturn(Optional.empty());
-
-        // When
-        ResultActions response = mockMvc.perform(get(serviceDetailUrl, containerId));
-
-        // Then
-        response.andExpect(status().isNotFound());
+            // Then
+            response.andExpect(status().isNotFound());
+        }
     }
 
     @Nested
