@@ -6,9 +6,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.practice.portcontainertrackingbackend.domain.Container;
 import com.practice.portcontainertrackingbackend.domain.repositories.ContainerRepository;
 import com.practice.portcontainertrackingbackend.integration.AbstractionContainerBaseTests;
+import java.util.List;
 import java.util.Optional;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -77,5 +79,36 @@ public class ContainerRepositoryITests extends AbstractionContainerBaseTests {
 
         // Then
         assertThat(containerRetrieved).isEmpty();
+    }
+
+    @Nested
+    class ListContainer {
+        @Test
+        void shouldReturnContainers_WhenContainersInDB() {
+            // Given
+            containerRepository.save(container);
+            containerRepository.save(generateContainer());
+            containerRepository.save(generateContainer());
+
+            // When
+            List<Container> containers = containerRepository.findAll();
+
+            // Then
+            assertThat(containers).hasSize(3);
+            assertThat(containers.get(0).getId()).isPositive();
+            assertThat(containers.get(1).getId()).isPositive();
+            assertThat(containers.get(2).getId()).isPositive();
+        }
+
+        @Test
+        void shouldReturnNoContainers_WhenNoContainersInDB() {
+            // Given no containers in db
+
+            // When
+            List<Container> containers = containerRepository.findAll();
+
+            // Then
+            assertThat(containers).isEmpty();
+        }
     }
 }
