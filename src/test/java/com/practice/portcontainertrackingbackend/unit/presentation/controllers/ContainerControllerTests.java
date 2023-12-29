@@ -9,12 +9,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.practice.portcontainertrackingbackend.application.ContainerServiceImpl;
+import com.practice.portcontainertrackingbackend.application.ContainerService;
 import com.practice.portcontainertrackingbackend.domain.Container;
 import com.practice.portcontainertrackingbackend.utilities.Constants;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -31,7 +34,7 @@ public class ContainerControllerTests {
     private MockMvc mockMvc;
 
     @MockBean
-    private ContainerServiceImpl containerService;
+    private ContainerService containerService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -40,6 +43,7 @@ public class ContainerControllerTests {
 
     private String serviceCreateUrl;
     private String serviceDetailUrl;
+    private String serviceListUrl;
 
     public Container generateContainer() {
         container = Instancio.create(Container.class);
@@ -51,6 +55,7 @@ public class ContainerControllerTests {
         container = generateContainer();
         serviceCreateUrl = Constants.BASE_URL + Constants.CREATE_CONTAINER_URL;
         serviceDetailUrl = Constants.BASE_URL + Constants.DETAIL_CONTAINER_URL;
+        serviceListUrl = Constants.BASE_URL + Constants.LIST_CONTAINER_URL;
     }
 
     @Test
@@ -116,5 +121,35 @@ public class ContainerControllerTests {
 
         // Then
         response.andExpect(status().isNotFound());
+    }
+
+    @Nested
+    class ListContainer {
+        @Test
+        void shouldReturnContainerListWhenContainersExist() throws Exception {
+            // Given
+            Container container2 = generateContainer();
+            List<Container> containers = List.of(container, container2);
+
+            given(containerService.getAllContainers()).willReturn(containers);
+
+            // When
+            ResultActions response = mockMvc.perform(get(serviceListUrl));
+
+            // Then
+            response.andExpect(status().isOk()).andExpect(jsonPath("$.size()", is(containers.size())));
+        }
+
+        @Test
+        void shouldReturnEmptyContainerListWhenNoContainersExist() throws Exception {
+            // Given
+            given(containerService.getAllContainers()).willReturn(Collections.emptyList());
+
+            // When
+            ResultActions response = mockMvc.perform(get(serviceListUrl));
+
+            // Then
+            response.andExpect(status().isOk()).andExpect(jsonPath("$.size()", is(0)));
+        }
     }
 }
