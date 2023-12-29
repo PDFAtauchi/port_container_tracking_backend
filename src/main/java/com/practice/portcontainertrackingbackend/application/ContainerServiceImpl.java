@@ -2,6 +2,7 @@ package com.practice.portcontainertrackingbackend.application;
 
 import com.practice.portcontainertrackingbackend.domain.Container;
 import com.practice.portcontainertrackingbackend.domain.repositories.ContainerRepository;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,5 +25,10 @@ public class ContainerServiceImpl implements ContainerService {
     @Override
     public Optional<Container> getContainer(int containerId) {
         return containerRepository.findById(containerId);
+    }
+
+    @Override
+    public List<Container> getAllContainers() {
+        return containerRepository.findAll();
     }
 }

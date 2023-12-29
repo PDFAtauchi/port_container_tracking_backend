@@ -4,9 +4,11 @@ import static org.assertj.core.api.Assertions.*;
 
 import com.practice.portcontainertrackingbackend.domain.Container;
 import com.practice.portcontainertrackingbackend.domain.repositories.ContainerRepository;
+import java.util.List;
 import java.util.Optional;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -22,8 +24,7 @@ public class ContainerRepositoryTests {
     private Container container;
 
     private Container generateContainer() {
-        Container container = Instancio.create(Container.class);
-        return container;
+        return Instancio.create(Container.class);
     }
 
     @BeforeEach
@@ -31,49 +32,86 @@ public class ContainerRepositoryTests {
         container = generateContainer();
     }
 
-    @Test
-    public void should_create_object_when_save_valid_object() {
-        // Given
+    @Nested
+    class CreateContainer {
+        @Test
+        void shouldPersistObjectSuccessfullyWhenCreateValidObject() {
+            // Given
 
-        // When
-        Container containerRetrieved = containerRepository.save(container);
+            // When
+            Container containerRetrieved = containerRepository.save(container);
 
-        // Then
-        assertThat(containerRetrieved).isNotNull();
-        assertThat(containerRetrieved.getId()).isPositive();
+            // Then
+            assertThat(containerRetrieved).isNotNull();
+            assertThat(containerRetrieved.getId()).isPositive();
+        }
+
+        @Test
+        void shouldThrowExceptionWhenSaveInvalidObject() {
+            // Given an invalid container
+
+            // When save
+
+            // Then
+            assertThatThrownBy(() -> containerRepository.save(null)).isInstanceOf(RuntimeException.class);
+        }
     }
 
-    @Test
-    public void should_return_exception_when_save_invalid_object() {
-        // Given an invalid container
+    @Nested
+    class RetrieveContainer {
+        @Test
+        void shouldRetrieveObjectWhenObjectExists() {
+            // Given
+            Container containerSaved = containerRepository.save(container);
 
-        // When save
+            // When
+            Optional<Container> containerRetrieved = containerRepository.findById(containerSaved.getId());
 
-        // Then
-        assertThatThrownBy(() -> containerRepository.save(null)).isInstanceOf(RuntimeException.class);
+            // Then
+            assertThat(containerRetrieved).isNotNull();
+        }
+
+        @Test
+        void shouldRetrieveEmptyWhenObjectDoesNotExist() {
+            // Given
+            int idNonexistentContainer = 1;
+
+            // When
+            Optional<Container> containerRetrieved = containerRepository.findById(idNonexistentContainer);
+
+            // Then
+            assertThat(containerRetrieved).isEmpty();
+        }
     }
 
-    @Test
-    public void should_retrieve_object_when_object_exist() {
-        // Given
-        Container containerSaved = containerRepository.save(container);
+    @Nested
+    class ListContainer {
+        @Test
+        void shouldReturnContainersWhenExist() {
+            // Given
+            containerRepository.save(container);
+            containerRepository.save(generateContainer());
+            containerRepository.save(generateContainer());
 
-        // When
-        Optional<Container> containerRetrieved = containerRepository.findById(containerSaved.getId());
+            // When
+            List<Container> containers = containerRepository.findAll();
 
-        // Then
-        assertThat(containerRetrieved).isNotNull();
-    }
+            // Then
+            assertThat(containers).hasSize(3);
+            assertThat(containers.get(0).getId()).isPositive();
+            assertThat(containers.get(1).getId()).isPositive();
+            assertThat(containers.get(2).getId()).isPositive();
+        }
 
-    @Test
-    public void should_retrieve_empty_when_object_does_not_exist() {
-        // Given
-        int idNonexistentContainer = 1;
+        @Test
+        void shouldReturnNoContainersIfNoneExist() {
+            // Given no containers in db
 
-        // When
-        Optional<Container> containerRetrieved = containerRepository.findById(idNonexistentContainer);
+            // When
+            List<Container> containers = containerRepository.findAll();
 
-        // Then
-        assertThat(containerRetrieved).isEmpty();
+            // Then
+            assertThat(containers).isEmpty();
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.practice.portcontainertrackingbackend.presentation.controllers;
 import com.practice.portcontainertrackingbackend.application.ContainerService;
 import com.practice.portcontainertrackingbackend.domain.Container;
 import com.practice.portcontainertrackingbackend.utilities.Constants;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,5 +34,10 @@ public class ContainerControllerImpl implements ContainerControllers {
         return foundContainer
                 .map(container -> new ResponseEntity<>(foundContainer, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    @Override
+    public List<Container> getAllContainers() {
+        return containerService.getAllContainers();
     }
 }

@@ -2,6 +2,7 @@ package com.practice.portcontainertrackingbackend.presentation.controllers;
 
 import com.practice.portcontainertrackingbackend.domain.Container;
 import com.practice.portcontainertrackingbackend.utilities.Constants;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,4 +17,7 @@ public interface ContainerControllers {
 
     @GetMapping(Constants.DETAIL_CONTAINER_URL)
     ResponseEntity<Optional<Container>> getContainer(@PathVariable Integer containerId);
+
+    @GetMapping(Constants.LIST_CONTAINER_URL)
+    List<Container> getAllContainers();
 }
