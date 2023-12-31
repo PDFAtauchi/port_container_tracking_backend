@@ -10,4 +10,6 @@ public interface ContainerService {
     Optional<Container> getContainer(int containerId);
 
     List<Container> getAllContainers();
+
+    Container updateContainer(int containerId, Container container);
 }

@@ -2,6 +2,7 @@ package com.practice.portcontainertrackingbackend.application;
 
 import com.practice.portcontainertrackingbackend.domain.Container;
 import com.practice.portcontainertrackingbackend.domain.repositories.ContainerRepository;
+import com.practice.portcontainertrackingbackend.exception.ContainerException;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,5 +31,33 @@ public class ContainerServiceImpl implements ContainerService {
     @Override
     public List<Container> getAllContainers() {
         return containerRepository.findAll();
+    }
+
+    @Override
+    public Container updateContainer(int containerId, Container container) {
+        Optional<Container> retrievedContainer = containerRepository.findById(containerId);
+
+        if (retrievedContainer.isPresent()) {
+            Container actualContainer = retrievedContainer.get();
+
+            try {
+                if (container.getCode() != null) {
+                    actualContainer.setCode(container.getCode());
+                }
+                if (container.getStatus() != null) {
+                    actualContainer.setStatus(container.getStatus());
+                }
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Error in arguments", e);
+            }
+
+            try {
+                return containerRepository.save(actualContainer);
+            } catch (Exception e) {
+                throw new ContainerException.ContainerUpdateException(
+                        "Error updating Container with id " + containerId, e);
+            }
+        }
+        throw new ContainerException.ContainerNotFoundException("Container with id " + containerId + " not found");
     }
 }

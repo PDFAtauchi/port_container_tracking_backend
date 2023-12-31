@@ -10,12 +10,13 @@ public class ConstantsTests {
     @Nested
     class ContainerUrls {
         @Test
-        public void should_verify_apis_urls() {
+        void should_verify_apis_urls() {
             // Then
             assertThat(Constants.BASE_URL).isEqualTo("/container");
             assertThat(Constants.CREATE_CONTAINER_URL).isEqualTo("/api/v1/create");
             assertThat(Constants.DETAIL_CONTAINER_URL).isEqualTo("/api/v1/detail/{containerId}");
             assertThat(Constants.LIST_CONTAINER_URL).isEqualTo("/api/v1/containers");
+            assertThat(Constants.UPDATE_CONTAINER_URL).isEqualTo("/api/v1/update/{containerId}");
         }
     }
 }
