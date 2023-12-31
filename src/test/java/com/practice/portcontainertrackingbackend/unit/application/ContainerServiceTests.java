@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 import com.practice.portcontainertrackingbackend.application.ContainerServiceImpl;
 import com.practice.portcontainertrackingbackend.domain.Container;
 import com.practice.portcontainertrackingbackend.domain.repositories.ContainerRepository;
+import com.practice.portcontainertrackingbackend.exception.ContainerException;
 import java.util.List;
 import java.util.Optional;
 import org.instancio.Instancio;
@@ -131,6 +132,99 @@ public class ContainerServiceTests {
             // Then
             verify(containerRepository, times(1)).findAll();
             assertThat(retrieveContainers).isEmpty();
+        }
+    }
+
+    @Nested
+    class UpdateContainer {
+        @Test
+        void shouldUpdateWhenObjectExistAndValid() {
+            // Given
+            int containerId = 1;
+            container.setId(containerId);
+            Container newContainer = generateContainer();
+
+            given(containerRepository.findById(containerId)).willReturn(Optional.of(container));
+            given(containerRepository.save(any(Container.class))).willReturn(container);
+
+            // When
+            Container updatedContainer = containerService.updateContainer(containerId, newContainer);
+
+            // Then
+            verify(containerRepository, times(1)).findById(containerId);
+            verify(containerRepository, times(1)).save(any(Container.class));
+            assertThat(updatedContainer).isNotNull();
+            assertThat(updatedContainer.getCode()).isEqualTo(newContainer.getCode());
+            assertThat(updatedContainer.getStatus()).isEqualTo(newContainer.getStatus());
+        }
+
+        @Test
+        void shouldThrowExceptionWhenUpdateNoExistingContainer() {
+            // Given
+            int containerId = 1;
+            Container newContainer = generateContainer();
+            given(containerRepository.findById(containerId)).willReturn(Optional.empty());
+
+            // When & Then
+            assertThatThrownBy(() -> containerService.updateContainer(containerId, newContainer))
+                    .isInstanceOf(ContainerException.ContainerNotFoundException.class);
+        }
+
+        @Test
+        void shouldThrowExceptionWhenErrorSavingContainer() {
+            // Given
+            int containerId = 1;
+            container.setId(containerId);
+            Container newContainer = generateContainer();
+
+            given(containerRepository.findById(containerId)).willReturn(Optional.of(container));
+            given(containerRepository.save(any(Container.class))).willThrow(RuntimeException.class);
+
+            // When & Then
+            assertThatThrownBy(() -> containerService.updateContainer(containerId, newContainer))
+                    .isInstanceOf(ContainerException.ContainerUpdateException.class);
+            verify(containerRepository, times(1)).findById(containerId);
+            verify(containerRepository, times(1)).save(any(Container.class));
+        }
+
+        @Test
+        void shouldThrowExceptionWhenInvalidStatusInContainerUpdate() {
+            // Given
+            int containerId = 1;
+            container.setId(containerId);
+            Container newContainer = generateContainer();
+
+            Container containerToUpdate = mock(Container.class);
+            doThrow(IllegalArgumentException.class).when(containerToUpdate).setStatus(any());
+            given(containerRepository.findById(containerId)).willReturn(Optional.of(containerToUpdate));
+
+            // When & Then
+            assertThatThrownBy(() -> containerService.updateContainer(containerId, newContainer))
+                    .isInstanceOf(IllegalArgumentException.class);
+            verify(containerRepository, times(1)).findById(containerId);
+        }
+
+        @Test
+        void shouldNotUpdateWhenNullAttributes() {
+            // Given
+            int containerId = 1;
+            container.setId(containerId);
+            Container newContainer = generateContainer();
+            newContainer.setCode(null);
+            newContainer.setStatus(null);
+
+            given(containerRepository.findById(containerId)).willReturn(Optional.of(container));
+            given(containerRepository.save(any(Container.class))).willReturn(container);
+
+            // When
+            Container updatedContainer = containerService.updateContainer(containerId, newContainer);
+
+            // Then
+            verify(containerRepository, times(1)).findById(containerId);
+            verify(containerRepository, times(1)).save(any(Container.class));
+            assertThat(updatedContainer).isNotNull();
+            assertThat(updatedContainer.getCode()).isNotNull();
+            assertThat(updatedContainer.getStatus()).isNotNull();
         }
     }
 }
