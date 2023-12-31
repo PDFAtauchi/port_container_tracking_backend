@@ -2,8 +2,8 @@ package com.practice.portcontainertrackingbackend.integration.presentation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -46,6 +46,7 @@ public class ContainerControllerITests extends AbstractionContainerBaseTests {
     private String serviceCreateUrl;
     private String serviceDetailUrl;
     private String serviceListUrl;
+    private String serviceUpdateUrl;
 
     public Container generateContainer() {
         return Instancio.create(Container.class);
@@ -57,6 +58,7 @@ public class ContainerControllerITests extends AbstractionContainerBaseTests {
         serviceCreateUrl = Constants.BASE_URL + Constants.CREATE_CONTAINER_URL;
         serviceDetailUrl = Constants.BASE_URL + Constants.DETAIL_CONTAINER_URL;
         serviceListUrl = Constants.BASE_URL + Constants.LIST_CONTAINER_URL;
+        serviceUpdateUrl = Constants.BASE_URL + Constants.UPDATE_CONTAINER_URL;
     }
 
     @Nested
@@ -149,6 +151,78 @@ public class ContainerControllerITests extends AbstractionContainerBaseTests {
 
             // Then
             response.andExpect(status().isOk()).andExpect(jsonPath("$.size()", is(0)));
+        }
+    }
+
+    @Nested
+    class UpdateContainer {
+        @Test
+        void shouldUpdateWhenObjectExistAndValid() throws Exception {
+            // Given
+            Container savedContainer = containerService.createContainer(container);
+            Container newContainer = generateContainer();
+
+            // When
+            ResultActions response = mockMvc.perform(put(serviceUpdateUrl, savedContainer.getId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(newContainer)));
+
+            // Then
+            response.andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id", is(savedContainer.getId())))
+                    .andExpect(jsonPath("$.code", is(newContainer.getCode())))
+                    .andExpect(jsonPath("$.status", is(newContainer.getStatus().toString())));
+        }
+
+        @Test
+        void shouldThrowExceptionWhenUpdateNoExistingContainer() throws Exception {
+            // Given
+            int containerId = 1;
+            Container newContainer = generateContainer();
+
+            // When
+            ResultActions response = mockMvc.perform(put(serviceUpdateUrl, containerId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(newContainer)));
+
+            // Then
+            response.andExpect(status().isNotFound());
+        }
+
+        @Test
+        void shouldThrowExceptionWhenInvalidStatusInContainerUpdate() throws Exception {
+            // Given
+            Container savedContainer = containerService.createContainer(container);
+
+            // When
+            ResultActions response = mockMvc.perform(put(serviceUpdateUrl, savedContainer.getId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{status: ABC}"));
+
+            // Then
+            response.andExpect(status().isBadRequest());
+        }
+
+        @Test
+        void shouldNotUpdateWhenNullAttributes() throws Exception {
+            // Given
+            Container savedContainer = containerService.createContainer(container);
+            Container newContainer = generateContainer();
+            newContainer.setId(0);
+            newContainer.setCode(null);
+            newContainer.setStatus(null);
+
+            // When
+            ResultActions response = mockMvc.perform(put(serviceUpdateUrl, savedContainer.getId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(newContainer)));
+
+            // Then
+            response.andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id", is(savedContainer.getId())))
+                    .andExpect(jsonPath("$.code", is(savedContainer.getCode())))
+                    .andExpect(
+                            jsonPath("$.status", is(savedContainer.getStatus().toString())));
         }
     }
 }
