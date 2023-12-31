@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.practice.portcontainertrackingbackend.application.ContainerService;
 import com.practice.portcontainertrackingbackend.domain.Container;
+import com.practice.portcontainertrackingbackend.exception.ContainerException;
 import com.practice.portcontainertrackingbackend.utilities.Constants;
 import java.util.Collections;
 import java.util.List;
@@ -44,6 +45,7 @@ public class ContainerControllerTests {
     private String serviceCreateUrl;
     private String serviceDetailUrl;
     private String serviceListUrl;
+    private String serviceUpdateUrl;
 
     public Container generateContainer() {
         return Instancio.create(Container.class);
@@ -55,6 +57,7 @@ public class ContainerControllerTests {
         serviceCreateUrl = Constants.BASE_URL + Constants.CREATE_CONTAINER_URL;
         serviceDetailUrl = Constants.BASE_URL + Constants.DETAIL_CONTAINER_URL;
         serviceListUrl = Constants.BASE_URL + Constants.LIST_CONTAINER_URL;
+        serviceUpdateUrl = Constants.BASE_URL + Constants.UPDATE_CONTAINER_URL;
     }
 
     @Nested
@@ -157,6 +160,105 @@ public class ContainerControllerTests {
 
             // Then
             response.andExpect(status().isOk()).andExpect(jsonPath("$.size()", is(0)));
+        }
+    }
+
+    @Nested
+    class UpdateContainer {
+        @Test
+        void shouldUpdateWhenObjectExistAndValid() throws Exception {
+            // Given
+            int containerId = 1;
+            container.setId(containerId);
+            Container newContainer = generateContainer();
+            given(containerService.updateContainer(anyInt(), any(Container.class)))
+                    .willAnswer(arguments -> arguments.getArgument(1));
+
+            // When
+            ResultActions response = mockMvc.perform(put(serviceUpdateUrl, containerId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(newContainer)));
+
+            // Then
+            response.andExpect(status().isOk())
+                    .andExpect(jsonPath("$.code", is(newContainer.getCode())))
+                    .andExpect(jsonPath("$.status", is(newContainer.getStatus().toString())));
+        }
+
+        @Test
+        void shouldThrowExceptionWhenUpdateNoExistingContainer() throws Exception {
+            // Given
+            int containerId = 1;
+            container.setId(containerId);
+            Container newContainer = generateContainer();
+            given(containerService.updateContainer(anyInt(), any(Container.class)))
+                    .willThrow(ContainerException.ContainerNotFoundException.class);
+
+            // When
+            ResultActions response = mockMvc.perform(put(serviceUpdateUrl, containerId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(newContainer)));
+
+            // Then
+            response.andExpect(status().isNotFound());
+        }
+
+        @Test
+        void shouldThrowExceptionWhenErrorSavingContainer() throws Exception {
+            // Given
+            int containerId = 1;
+            container.setId(containerId);
+            Container newContainer = generateContainer();
+            given(containerService.updateContainer(anyInt(), any(Container.class)))
+                    .willThrow(ContainerException.ContainerUpdateException.class);
+
+            // When
+            ResultActions response = mockMvc.perform(put(serviceUpdateUrl, containerId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(newContainer)));
+
+            // Then
+            response.andExpect(status().is5xxServerError());
+        }
+
+        @Test
+        void shouldThrowExceptionWhenInvalidStatusInContainerUpdate() throws Exception {
+            // Given
+            int containerId = 1;
+            container.setId(containerId);
+            Container newContainer = generateContainer();
+            given(containerService.updateContainer(anyInt(), any(Container.class)))
+                    .willThrow(IllegalArgumentException.class);
+
+            // When
+            ResultActions response = mockMvc.perform(put(serviceUpdateUrl, containerId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(newContainer)));
+
+            // Then
+            response.andExpect(status().isBadRequest());
+        }
+
+        @Test
+        void shouldNotUpdateWhenNullAttributes() throws Exception {
+            // Given
+            int containerId = 1;
+            container.setId(containerId);
+            Container newContainer = generateContainer();
+            newContainer.setCode(null);
+            newContainer.setStatus(null);
+            given(containerService.updateContainer(anyInt(), any(Container.class)))
+                    .willReturn(container);
+
+            // When
+            ResultActions response = mockMvc.perform(put(serviceUpdateUrl, containerId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(newContainer)));
+
+            // Then
+            response.andExpect(status().isOk())
+                    .andExpect(jsonPath("$.code", is(container.getCode())))
+                    .andExpect(jsonPath("$.status", is(container.getStatus().toString())));
         }
     }
 }
