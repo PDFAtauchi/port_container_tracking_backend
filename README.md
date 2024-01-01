@@ -216,6 +216,19 @@ Container register
 | PUT   | /container/api/v1/update/1 | Update Container | Content-Type: application/json| `{"id": 1, "code": "DFG", "status": "OTHER"}`         | 400 Bad Request | `{"timestamp": "...", "status": 400, "error": "Bad Request", "message": "...", "path": "/container/api/v1/update/1"}` |
 | PUT   | /container/api/v1/update/5 | Update Container | Content-Type: application/json| `{"id": 5, "code": "DFG", "status": "PICKED_UP"}`     | 404 Not Found   | |
 
+### Endpoint Delete Container example
+Container register
+{
+"id": 1,
+"code": "ABC",
+"status": "UNLOADING"
+}
+
+| Method | Endpoint                   | Description      | Response Status |
+|--------|----------------------------|------------------|-----------------|
+| DELETE | /container/api/v1/delete/1 | Delete Container | 204 Not Content |
+| DELETE | /container/api/v1/delete/5 | Delete Container | 404 Not Found   |
+
 ### To Run Test
 ```sh
 ./gradlew test
