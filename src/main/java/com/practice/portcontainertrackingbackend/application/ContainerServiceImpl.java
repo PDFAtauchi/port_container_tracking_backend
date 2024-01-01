@@ -63,6 +63,13 @@ public class ContainerServiceImpl implements ContainerService {
 
     @Override
     public void deleteContainerById(int containerId) {
-        containerRepository.deleteById(containerId);
+        Optional<Container> retrievedContainer = containerRepository.findById(containerId);
+
+        if (retrievedContainer.isPresent()) {
+            Container actualContainer = retrievedContainer.get();
+            containerRepository.deleteById(actualContainer.getId());
+        } else {
+            throw new ContainerException.ContainerNotFoundException("Container with id " + containerId + " not found");
+        }
     }
 }

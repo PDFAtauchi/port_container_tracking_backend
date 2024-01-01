@@ -235,6 +235,8 @@ public class ContainerServiceTests {
             // Given
             int containerId = 1;
             container.setId(containerId);
+            given(containerRepository.findById(containerId)).willReturn(Optional.of(container));
+            doNothing().when(containerRepository).deleteById(containerId);
 
             // When
             containerService.deleteContainerById(container.getId());
@@ -248,10 +250,9 @@ public class ContainerServiceTests {
             // Given
             int containerId = 1;
 
-            // When
-            containerService.deleteContainerById(container.getId());
-
-            // Then
+            // When & Then
+            assertThatThrownBy(() -> containerService.deleteContainerById(containerId))
+                    .isInstanceOf(ContainerException.ContainerNotFoundException.class);
             verify(containerRepository, times(0)).deleteById(containerId);
         }
     }
