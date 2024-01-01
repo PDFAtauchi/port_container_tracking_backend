@@ -46,6 +46,7 @@ public class ContainerControllerTests {
     private String serviceDetailUrl;
     private String serviceListUrl;
     private String serviceUpdateUrl;
+    private String serviceDeleteUrl;
 
     public Container generateContainer() {
         return Instancio.create(Container.class);
@@ -58,6 +59,7 @@ public class ContainerControllerTests {
         serviceDetailUrl = Constants.BASE_URL + Constants.DETAIL_CONTAINER_URL;
         serviceListUrl = Constants.BASE_URL + Constants.LIST_CONTAINER_URL;
         serviceUpdateUrl = Constants.BASE_URL + Constants.UPDATE_CONTAINER_URL;
+        serviceDeleteUrl = Constants.BASE_URL + Constants.DELETE_CONTAINER_URL;
     }
 
     @Nested
@@ -259,6 +261,38 @@ public class ContainerControllerTests {
             response.andExpect(status().isOk())
                     .andExpect(jsonPath("$.code", is(container.getCode())))
                     .andExpect(jsonPath("$.status", is(container.getStatus().toString())));
+        }
+    }
+
+    @Nested
+    class DeleteContainer {
+        @Test
+        void shouldDeleteObjectWhenExist() throws Exception {
+            // Given
+            int containerId = 1;
+            container.setId(containerId);
+            doNothing().when(containerService).deleteContainerById(containerId);
+
+            // When
+            ResultActions response = mockMvc.perform(delete(serviceDeleteUrl, containerId));
+
+            // Then
+            response.andExpect(status().isNoContent());
+        }
+
+        @Test
+        void shouldNotDeleteObjectWhenNotExist() throws Exception {
+            // Given
+            int containerId = 1;
+            doThrow(ContainerException.ContainerNotFoundException.class)
+                    .when(containerService)
+                    .deleteContainerById(containerId);
+
+            // When
+            ResultActions response = mockMvc.perform(delete(serviceDeleteUrl, containerId));
+
+            // Then
+            response.andExpect(status().isNotFound());
         }
     }
 }

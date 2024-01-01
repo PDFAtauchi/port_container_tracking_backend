@@ -64,4 +64,19 @@ public class ContainerControllerImpl implements ContainerControllers {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @Override
+    public ResponseEntity<Void> deleteContainer(Integer containerId) {
+        try {
+            containerService.deleteContainerById(containerId);
+            log.info("Container deleted successfully: {}", containerId);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (ContainerException.ContainerNotFoundException e) {
+            log.error("Container not found with ID: {}", containerId, e);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            log.error("Unexpected error for delete container with ID: {}", containerId, e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
