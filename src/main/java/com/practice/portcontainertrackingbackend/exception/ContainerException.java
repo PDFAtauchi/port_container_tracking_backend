@@ -6,10 +6,4 @@ public class ContainerException {
             super(message);
         }
     }
-
-    public static class ContainerUpdateException extends RuntimeException {
-        public ContainerUpdateException(String message, Throwable cause) {
-            super(message, cause);
-        }
-    }
 }

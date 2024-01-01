@@ -39,7 +39,6 @@ public class ContainerServiceImpl implements ContainerService {
 
         if (retrievedContainer.isPresent()) {
             Container actualContainer = retrievedContainer.get();
-
             try {
                 if (container.getCode() != null) {
                     actualContainer.setCode(container.getCode());
@@ -50,14 +49,20 @@ public class ContainerServiceImpl implements ContainerService {
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("Error in arguments", e);
             }
-
-            try {
-                return containerRepository.save(actualContainer);
-            } catch (Exception e) {
-                throw new ContainerException.ContainerUpdateException(
-                        "Error updating Container with id " + containerId, e);
-            }
+            return containerRepository.save(actualContainer);
         }
         throw new ContainerException.ContainerNotFoundException("Container with id " + containerId + " not found");
+    }
+
+    @Override
+    public void deleteContainerById(int containerId) {
+        Optional<Container> retrievedContainer = containerRepository.findById(containerId);
+
+        if (retrievedContainer.isPresent()) {
+            Container actualContainer = retrievedContainer.get();
+            containerRepository.deleteById(actualContainer.getId());
+        } else {
+            throw new ContainerException.ContainerNotFoundException("Container with id " + containerId + " not found");
+        }
     }
 }

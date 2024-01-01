@@ -20,4 +20,7 @@ public interface ContainerControllers {
 
     @PutMapping(Constants.UPDATE_CONTAINER_URL)
     ResponseEntity<Container> updateContainer(@PathVariable Integer containerId, @RequestBody Container container);
+
+    @DeleteMapping(Constants.DELETE_CONTAINER_URL)
+    ResponseEntity<Void> deleteContainer(@PathVariable Integer containerId);
 }

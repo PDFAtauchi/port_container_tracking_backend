@@ -182,7 +182,7 @@ public class ContainerServiceTests {
 
             // When & Then
             assertThatThrownBy(() -> containerService.updateContainer(containerId, newContainer))
-                    .isInstanceOf(ContainerException.ContainerUpdateException.class);
+                    .isInstanceOf(RuntimeException.class);
             verify(containerRepository, times(1)).findById(containerId);
             verify(containerRepository, times(1)).save(any(Container.class));
         }
@@ -225,6 +225,35 @@ public class ContainerServiceTests {
             assertThat(updatedContainer).isNotNull();
             assertThat(updatedContainer.getCode()).isNotNull();
             assertThat(updatedContainer.getStatus()).isNotNull();
+        }
+    }
+
+    @Nested
+    class DeleteContainer {
+        @Test
+        void shouldDeleteObjectWhenExist() {
+            // Given
+            int containerId = 1;
+            container.setId(containerId);
+            given(containerRepository.findById(containerId)).willReturn(Optional.of(container));
+            doNothing().when(containerRepository).deleteById(containerId);
+
+            // When
+            containerService.deleteContainerById(container.getId());
+
+            // Then
+            verify(containerRepository, times(1)).deleteById(containerId);
+        }
+
+        @Test
+        void shouldNotDeleteObjectWhenNotExist() {
+            // Given
+            int containerId = 1;
+
+            // When & Then
+            assertThatThrownBy(() -> containerService.deleteContainerById(containerId))
+                    .isInstanceOf(ContainerException.ContainerNotFoundException.class);
+            verify(containerRepository, times(0)).deleteById(containerId);
         }
     }
 }

@@ -17,6 +17,7 @@ public class ConstantsTests {
             assertThat(Constants.DETAIL_CONTAINER_URL).isEqualTo("/api/v1/detail/{containerId}");
             assertThat(Constants.LIST_CONTAINER_URL).isEqualTo("/api/v1/containers");
             assertThat(Constants.UPDATE_CONTAINER_URL).isEqualTo("/api/v1/update/{containerId}");
+            assertThat(Constants.DELETE_CONTAINER_URL).isEqualTo("/api/v1/delete/{containerId}");
         }
     }
 }

@@ -2,6 +2,7 @@ package com.practice.portcontainertrackingbackend.integration.presentation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -47,6 +48,7 @@ public class ContainerControllerITests extends AbstractionContainerBaseTests {
     private String serviceDetailUrl;
     private String serviceListUrl;
     private String serviceUpdateUrl;
+    private String serviceDeleteUrl;
 
     public Container generateContainer() {
         return Instancio.create(Container.class);
@@ -59,6 +61,7 @@ public class ContainerControllerITests extends AbstractionContainerBaseTests {
         serviceDetailUrl = Constants.BASE_URL + Constants.DETAIL_CONTAINER_URL;
         serviceListUrl = Constants.BASE_URL + Constants.LIST_CONTAINER_URL;
         serviceUpdateUrl = Constants.BASE_URL + Constants.UPDATE_CONTAINER_URL;
+        serviceDeleteUrl = Constants.BASE_URL + Constants.DELETE_CONTAINER_URL;
     }
 
     @Nested
@@ -130,7 +133,7 @@ public class ContainerControllerITests extends AbstractionContainerBaseTests {
     @Nested
     class ListContainer {
         @Test
-        void shouldReturnContainerListWhenContainersExist() throws Exception {
+        void shouldReturnContainerListWithOkStatusWhenContainersExist() throws Exception {
             // Given
             containerService.createContainer(container);
             containerService.createContainer(generateContainer());
@@ -143,7 +146,7 @@ public class ContainerControllerITests extends AbstractionContainerBaseTests {
         }
 
         @Test
-        void shouldReturnEmptyContainerListWhenNoContainersExist() throws Exception {
+        void shouldReturnEmptyContainerListWithOkStatusWhenNoContainersExist() throws Exception {
             // Given no containers
 
             // When
@@ -157,7 +160,7 @@ public class ContainerControllerITests extends AbstractionContainerBaseTests {
     @Nested
     class UpdateContainer {
         @Test
-        void shouldUpdateWhenObjectExistAndValid() throws Exception {
+        void shouldUpdateWithOkStatusWhenObjectExistsAndIsValid() throws Exception {
             // Given
             Container savedContainer = containerService.createContainer(container);
             Container newContainer = generateContainer();
@@ -175,7 +178,7 @@ public class ContainerControllerITests extends AbstractionContainerBaseTests {
         }
 
         @Test
-        void shouldThrowExceptionWhenUpdateNoExistingContainer() throws Exception {
+        void shouldReturnNotFoundWhenUpdateNoExistingContainer() throws Exception {
             // Given
             int containerId = 1;
             Container newContainer = generateContainer();
@@ -190,7 +193,7 @@ public class ContainerControllerITests extends AbstractionContainerBaseTests {
         }
 
         @Test
-        void shouldThrowExceptionWhenInvalidStatusInContainerUpdate() throws Exception {
+        void shouldReturnBadRequestWhenInvalidStatusInContainerUpdate() throws Exception {
             // Given
             Container savedContainer = containerService.createContainer(container);
 
@@ -204,7 +207,7 @@ public class ContainerControllerITests extends AbstractionContainerBaseTests {
         }
 
         @Test
-        void shouldNotUpdateWhenNullAttributes() throws Exception {
+        void shouldReturnOkAndNotUpdateContainerWhenNullAttributes() throws Exception {
             // Given
             Container savedContainer = containerService.createContainer(container);
             Container newContainer = generateContainer();
@@ -223,6 +226,33 @@ public class ContainerControllerITests extends AbstractionContainerBaseTests {
                     .andExpect(jsonPath("$.code", is(savedContainer.getCode())))
                     .andExpect(
                             jsonPath("$.status", is(savedContainer.getStatus().toString())));
+        }
+    }
+
+    @Nested
+    class DeleteContainer {
+        @Test
+        void shouldReturnNoContentWhenDeleteExistContainer() throws Exception {
+            // Given
+            Container savedContainer = containerService.createContainer(container);
+
+            // When
+            ResultActions response = mockMvc.perform(delete(serviceDeleteUrl, savedContainer.getId()));
+
+            // Then
+            response.andExpect(status().isNoContent());
+        }
+
+        @Test
+        void shouldReturnNotFoundWhenNotExist() throws Exception {
+            // Given
+            int containerId = 1;
+
+            // When
+            ResultActions response = mockMvc.perform(delete(serviceDeleteUrl, containerId));
+
+            // Then
+            response.andExpect(status().isNotFound());
         }
     }
 }

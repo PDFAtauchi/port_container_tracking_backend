@@ -12,4 +12,6 @@ public interface ContainerService {
     List<Container> getAllContainers();
 
     Container updateContainer(int containerId, Container container);
+
+    void deleteContainerById(int containerId);
 }
