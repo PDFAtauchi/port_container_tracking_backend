@@ -114,4 +114,31 @@ public class ContainerRepositoryTests {
             assertThat(containers).isEmpty();
         }
     }
+
+    @Nested
+    class DeleteContainer {
+        @Test
+        void shouldDeleteObjectWhenExist() {
+            // Given
+            Container savedContainer = containerRepository.save(container);
+
+            // When
+            containerRepository.deleteById(savedContainer.getId());
+
+            // Then
+            assertThat(containerRepository.findById(savedContainer.getId())).isEmpty();
+        }
+
+        @Test
+        void shouldNotDeleteObjectWhenNotExist() {
+            // Given
+            int containerId = 1;
+
+            // When
+            containerRepository.deleteById(containerId);
+
+            // Then
+            assertThat(containerRepository.findById(containerId)).isEmpty();
+        }
+    }
 }

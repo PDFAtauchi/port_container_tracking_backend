@@ -12,4 +12,6 @@ public interface ContainerRepository extends JpaRepository<Container, Integer> {
     Optional<Container> findById(Integer id);
 
     List<Container> findAll();
+
+    void deleteById(Integer id);
 }
