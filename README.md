@@ -70,7 +70,7 @@ Thus, in this project we will focus on the **container management**, specificall
     1. Frontend:
         1. Options available: (React, Angular, Vue.js)
         1. Based on a Google research all of them are good options to develop the frontend app ([comparative](https://www.browserstack.com/guide/angular-vs-react-vs-vue)).
-        2. Based on my preferences, I will use React (Next.js).
+        2. Based on my preferences, I will use ReactJs.
     1. Database:
         1. Options available: (PostgreSQl, Oracle, SQL Server)
         2. I can choose PostgreSQl or Oracle based on the compatibility with the backend language and DB decisions for the
@@ -199,6 +199,22 @@ localhost:8080/container/api/v1/containers
 Response
 []
 ```
+
+
+### Endpoint Update Container example
+Container register
+{
+"id": 1,
+"code": "ABC",
+"status": "UNLOADING"
+}
+
+| Method | Endpoint                   | Description     | Request Headers                   | Request Body (Example)                                | Response Status | Response Body (Example)                                                                                               |
+|--------|----------------------------|-----------------|------------------------------------|-------------------------------------------------------|-----------------|-----------------------------------------------------------------------------------------------------------------------|
+| PUT    | /container/api/v1/update/1 | Update Container | Content-Type: application/json| ```{"id": 1, "code": "EFG", "status": "PICKED_UP"}``` | 200 OK          | `{"id": 1, "code": "EFG", "status": "PICKED_UP"}`                                                                     |
+| PUT   | /container/api/v1/update/1 | Update Container | Content-Type: application/json| `{"id": 1, "code": null, "status": null}`             | 200 OK          | `{"id": 1, "code": "ABC", "status": "UNLOADING"}`|
+| PUT   | /container/api/v1/update/1 | Update Container | Content-Type: application/json| `{"id": 1, "code": "DFG", "status": "OTHER"}`         | 400 Bad Request | `{"timestamp": "...", "status": 400, "error": "Bad Request", "message": "...", "path": "/container/api/v1/update/1"}` |
+| PUT   | /container/api/v1/update/5 | Update Container | Content-Type: application/json| `{"id": 5, "code": "DFG", "status": "PICKED_UP"}`     | 404 Not Found   | |
 
 ### To Run Test
 ```sh
