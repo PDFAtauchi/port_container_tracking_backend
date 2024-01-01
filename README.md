@@ -165,40 +165,11 @@ localhost:8080/container/api/v1/detail/1
 Response: 404 Not Found
 ```
 
-#### API list containers
-GET 200 Ok
-```
-exist containers
-
-Request
-localhost:8080/container/api/v1/containers
-
-
-Response
-[
-    {
-        "id": 1,
-        "code": "ABC",
-        "status": "UNLOADING"
-    },
-    {
-        "id": 2,
-        "code": "ABC",
-        "status": "PICKED_UP"
-    }
-]
-```
-
-GET 200 Ok
-```
-no exist containers
-
-Request
-localhost:8080/container/api/v1/containers
-
-Response
-[]
-```
+### Endpoint List Container example
+| HTTP Method | Endpoint                        | Description                         | Response Status | Response Body (Example)                               |
+|-------------|---------------------------------|-------------------------------------|------------------|--------------------------------------------------------|
+| GET         | /container/api/v1/containers    | List Containers - exists containers | 200 OK           | `[{"id": 1, "code": "ABC", "status": "UNLOADING"}, {"id": 2, "code": "ABC", "status": "PICKED_UP"}]` |
+| GET         | /container/api/v1/containers    | List Containers - no containers     | 200 OK           | `[]`                                                   |
 
 
 ### Endpoint Update Container example
