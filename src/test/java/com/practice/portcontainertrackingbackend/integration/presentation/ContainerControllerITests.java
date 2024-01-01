@@ -133,7 +133,7 @@ public class ContainerControllerITests extends AbstractionContainerBaseTests {
     @Nested
     class ListContainer {
         @Test
-        void shouldReturnContainerListWhenContainersExist() throws Exception {
+        void shouldReturnContainerListWithOkStatusWhenContainersExist() throws Exception {
             // Given
             containerService.createContainer(container);
             containerService.createContainer(generateContainer());
@@ -146,7 +146,7 @@ public class ContainerControllerITests extends AbstractionContainerBaseTests {
         }
 
         @Test
-        void shouldReturnEmptyContainerListWhenNoContainersExist() throws Exception {
+        void shouldReturnEmptyContainerListWithOkStatusWhenNoContainersExist() throws Exception {
             // Given no containers
 
             // When
@@ -160,7 +160,7 @@ public class ContainerControllerITests extends AbstractionContainerBaseTests {
     @Nested
     class UpdateContainer {
         @Test
-        void shouldUpdateWhenObjectExistAndValid() throws Exception {
+        void shouldUpdateWithOkStatusWhenObjectExistsAndIsValid() throws Exception {
             // Given
             Container savedContainer = containerService.createContainer(container);
             Container newContainer = generateContainer();
@@ -178,7 +178,7 @@ public class ContainerControllerITests extends AbstractionContainerBaseTests {
         }
 
         @Test
-        void shouldThrowExceptionWhenUpdateNoExistingContainer() throws Exception {
+        void shouldReturnNotFoundWhenUpdateNoExistingContainer() throws Exception {
             // Given
             int containerId = 1;
             Container newContainer = generateContainer();
@@ -193,7 +193,7 @@ public class ContainerControllerITests extends AbstractionContainerBaseTests {
         }
 
         @Test
-        void shouldThrowExceptionWhenInvalidStatusInContainerUpdate() throws Exception {
+        void shouldReturnBadRequestWhenInvalidStatusInContainerUpdate() throws Exception {
             // Given
             Container savedContainer = containerService.createContainer(container);
 
@@ -207,7 +207,7 @@ public class ContainerControllerITests extends AbstractionContainerBaseTests {
         }
 
         @Test
-        void shouldNotUpdateWhenNullAttributes() throws Exception {
+        void shouldReturnOkAndNotUpdateContainerWhenNullAttributes() throws Exception {
             // Given
             Container savedContainer = containerService.createContainer(container);
             Container newContainer = generateContainer();
@@ -232,7 +232,7 @@ public class ContainerControllerITests extends AbstractionContainerBaseTests {
     @Nested
     class DeleteContainer {
         @Test
-        void shouldDeleteObjectWhenExist() throws Exception {
+        void shouldReturnNoContentWhenDeleteExistContainer() throws Exception {
             // Given
             Container savedContainer = containerService.createContainer(container);
 
@@ -244,7 +244,7 @@ public class ContainerControllerITests extends AbstractionContainerBaseTests {
         }
 
         @Test
-        void shouldNotDeleteObjectWhenNotExist() throws Exception {
+        void shouldReturnNotFoundWhenNotExist() throws Exception {
             // Given
             int containerId = 1;
 
