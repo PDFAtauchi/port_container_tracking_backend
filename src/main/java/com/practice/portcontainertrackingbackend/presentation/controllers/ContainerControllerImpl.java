@@ -48,14 +48,10 @@ public class ContainerControllerImpl implements ContainerControllers {
     public ResponseEntity<Container> updateContainer(Integer containerId, Container container) {
         try {
             Container containerUpdated = containerService.updateContainer(containerId, container);
-            log.info("Container updated successfully: {}", containerUpdated);
             return new ResponseEntity<>(containerUpdated, HttpStatus.OK);
         } catch (ContainerException.ContainerNotFoundException e) {
             log.error("Container not found with ID: {}", containerId, e);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (ContainerException.ContainerUpdateException e) {
-            log.error("Error updating container with ID: {}", containerId, e);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (IllegalArgumentException e) {
             log.warn("Bad request for container with ID: {}", containerId, e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -69,7 +65,6 @@ public class ContainerControllerImpl implements ContainerControllers {
     public ResponseEntity<Void> deleteContainer(Integer containerId) {
         try {
             containerService.deleteContainerById(containerId);
-            log.info("Container deleted successfully: {}", containerId);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (ContainerException.ContainerNotFoundException e) {
             log.error("Container not found with ID: {}", containerId, e);

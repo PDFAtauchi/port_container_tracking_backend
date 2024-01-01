@@ -182,7 +182,7 @@ public class ContainerServiceTests {
 
             // When & Then
             assertThatThrownBy(() -> containerService.updateContainer(containerId, newContainer))
-                    .isInstanceOf(ContainerException.ContainerUpdateException.class);
+                    .isInstanceOf(RuntimeException.class);
             verify(containerRepository, times(1)).findById(containerId);
             verify(containerRepository, times(1)).save(any(Container.class));
         }

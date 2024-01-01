@@ -212,7 +212,7 @@ public class ContainerControllerTests {
             container.setId(containerId);
             Container newContainer = generateContainer();
             given(containerService.updateContainer(anyInt(), any(Container.class)))
-                    .willThrow(ContainerException.ContainerUpdateException.class);
+                    .willThrow(RuntimeException.class);
 
             // When
             ResultActions response = mockMvc.perform(put(serviceUpdateUrl, containerId)
