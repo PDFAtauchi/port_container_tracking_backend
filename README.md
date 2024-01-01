@@ -138,41 +138,28 @@ Response
 }
 ```
 
-#### API get detail container
-GET 200 Ok
-```
-exist container id
-
-Request
-localhost:8080/container/api/v1/detail/1
-
-
-Response
+#### Endpoint Detail Container example
+container register
 {
-    "id": 1,
-    "code": "ABC",
-    "status": "CUSTOMS_CLEARANCE"
+"id": 1,
+"code": "ABC",
+"status": "CUSTOMS_CLEARANCE"
 }
-```
 
-GET 404 Not Found
-```
-no exist container id
+| HTTP Method | Endpoint                   | Description                        | Response Status  | Response Body (Example)                               |
+|-------------|----------------------------|------------------------------------|------------------|--------------------------------------------------------|
+| GET         | /container/api/v1/detail/1 | Detail Container - exists container | 200 OK           | `{"id": 1, "code": "ABC", "status": "CUSTOMS_CLEARANCE"}` |
+| GET         | /container/api/v1/detail/5 | Detail Container - no container    | 404 Not Found     |                                                        |
 
-Request
-localhost:8080/container/api/v1/detail/1
 
-Response: 404 Not Found
-```
-
-### Endpoint List Container example
+#### Endpoint List Container example
 | HTTP Method | Endpoint                        | Description                         | Response Status | Response Body (Example)                               |
 |-------------|---------------------------------|-------------------------------------|------------------|--------------------------------------------------------|
 | GET         | /container/api/v1/containers    | List Containers - exists containers | 200 OK           | `[{"id": 1, "code": "ABC", "status": "UNLOADING"}, {"id": 2, "code": "ABC", "status": "PICKED_UP"}]` |
 | GET         | /container/api/v1/containers    | List Containers - no containers     | 200 OK           | `[]`                                                   |
 
 
-### Endpoint Update Container example
+#### Endpoint Update Container example
 Container register
 {
 "id": 1,
@@ -187,7 +174,7 @@ Container register
 | PUT   | /container/api/v1/update/1 | Update Container | Content-Type: application/json| `{"id": 1, "code": "DFG", "status": "OTHER"}`         | 400 Bad Request | `{"timestamp": "...", "status": 400, "error": "Bad Request", "message": "...", "path": "/container/api/v1/update/1"}` |
 | PUT   | /container/api/v1/update/5 | Update Container | Content-Type: application/json| `{"id": 5, "code": "DFG", "status": "PICKED_UP"}`     | 404 Not Found   | |
 
-### Endpoint Delete Container example
+#### Endpoint Delete Container example
 Container register
 {
 "id": 1,
