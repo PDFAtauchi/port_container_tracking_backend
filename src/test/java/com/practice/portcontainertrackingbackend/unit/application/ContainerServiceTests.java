@@ -227,4 +227,32 @@ public class ContainerServiceTests {
             assertThat(updatedContainer.getStatus()).isNotNull();
         }
     }
+
+    @Nested
+    class DeleteContainer {
+        @Test
+        void shouldDeleteObjectWhenExist() {
+            // Given
+            int containerId = 1;
+            container.setId(containerId);
+
+            // When
+            containerService.deleteContainerById(container.getId());
+
+            // Then
+            verify(containerRepository, times(1)).deleteById(containerId);
+        }
+
+        @Test
+        void shouldNotDeleteObjectWhenNotExist() {
+            // Given
+            int containerId = 1;
+
+            // When
+            containerService.deleteContainerById(container.getId());
+
+            // Then
+            verify(containerRepository, times(0)).deleteById(containerId);
+        }
+    }
 }

@@ -60,4 +60,9 @@ public class ContainerServiceImpl implements ContainerService {
         }
         throw new ContainerException.ContainerNotFoundException("Container with id " + containerId + " not found");
     }
+
+    @Override
+    public void deleteContainerById(int containerId) {
+        containerRepository.deleteById(containerId);
+    }
 }
