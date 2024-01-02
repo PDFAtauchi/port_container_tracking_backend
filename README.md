@@ -70,7 +70,7 @@ Thus, in this project we will focus on the **container management**, specificall
     1. Frontend:
         1. Options available: (React, Angular, Vue.js)
         1. Based on a Google research all of them are good options to develop the frontend app ([comparative](https://www.browserstack.com/guide/angular-vs-react-vs-vue)).
-        2. Based on my preferences, I will use React (Next.js).
+        2. Based on my preferences, I will use ReactJs.
     1. Database:
         1. Options available: (PostgreSQl, Oracle, SQL Server)
         2. I can choose PostgreSQl or Oracle based on the compatibility with the backend language and DB decisions for the
@@ -101,104 +101,63 @@ POSTGRES_PASSWORD=db-password
 ```
 After run access to (http://localhost:8080/api-route)
 ### API usage
-#### API create container
-POST 201 Created
-```
-localhost:8080/container/api/v1/create
-Request
+#### Endpoint Create Container example
+
+| Method | Endpoint                 | Description                    | Request Headers                   | Request Body (Example)                     | Response Status           | Response Body (Example)                                                                                                       |
+|--------|--------------------------|--------------------------------|------------------------------------|--------------------------------------------|---------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| POST   | /container/api/v1/create | Create Container               | Content-Type: application/json| ```{"code": "ABC", "status": "PICKED_UP"}``` | 201 Created               | `{"id": 1, "code": "ABC", "status": "PICKED_UP"}`                                                                             |
+| POST    | /container/api/v1/create | Create Container               | Content-Type: application/json| `{"code": "ABC", "status": "OTHER"}`       | 400 Bad Request           | `{"timestamp": "...", "status": 400, "error": "Bad Request", "message": "...", "path": "/container/api/v1/create"}`           |
+| POST    | /container/api/v1/create | Create Container - null fields | Content-Type: application/json| `{"code": "ABC"}`     | 500 Internal Server Error | `{"timestamp": "...", "status": 500, "error": "Internal Server Error", "message": "...", "path": "/container/api/v1/create"}` |
+
+
+#### Endpoint Detail Container example
+container register
 {
-    "code": "ABC",
-    "status": "CUSTOMS_CLEARANCE"
+"id": 1,
+"code": "ABC",
+"status": "CUSTOMS_CLEARANCE"
 }
 
-Response
+| HTTP Method | Endpoint                   | Description                        | Response Status  | Response Body (Example)                               |
+|-------------|----------------------------|------------------------------------|------------------|--------------------------------------------------------|
+| GET         | /container/api/v1/detail/1 | Detail Container - exists container | 200 OK           | `{"id": 1, "code": "ABC", "status": "CUSTOMS_CLEARANCE"}` |
+| GET         | /container/api/v1/detail/5 | Detail Container - no container    | 404 Not Found     |                                                        |
+
+
+#### Endpoint List Container example
+| HTTP Method | Endpoint                        | Description                         | Response Status | Response Body (Example)                               |
+|-------------|---------------------------------|-------------------------------------|------------------|--------------------------------------------------------|
+| GET         | /container/api/v1/containers    | List Containers - exists containers | 200 OK           | `[{"id": 1, "code": "ABC", "status": "UNLOADING"}, {"id": 2, "code": "ABC", "status": "PICKED_UP"}]` |
+| GET         | /container/api/v1/containers    | List Containers - no containers     | 200 OK           | `[]`                                                   |
+
+
+#### Endpoint Update Container example
+Container register
 {
-    "id": 1,
-    "code": "ABC",
-    "status": "CUSTOMS_CLEARANCE"
+"id": 1,
+"code": "ABC",
+"status": "UNLOADING"
 }
-```
 
-POST 400 Bad Request
-```
-localhost:8080/container/api/v1/create
-Request
+| Method | Endpoint                   | Description     | Request Headers                   | Request Body (Example)                                | Response Status | Response Body (Example)                                                                                               |
+|--------|----------------------------|-----------------|------------------------------------|-------------------------------------------------------|-----------------|-----------------------------------------------------------------------------------------------------------------------|
+| PUT    | /container/api/v1/update/1 | Update Container | Content-Type: application/json| ```{"id": 1, "code": "EFG", "status": "PICKED_UP"}``` | 200 OK          | `{"id": 1, "code": "EFG", "status": "PICKED_UP"}`                                                                     |
+| PUT   | /container/api/v1/update/1 | Update Container | Content-Type: application/json| `{"id": 1, "code": null, "status": null}`             | 200 OK          | `{"id": 1, "code": "ABC", "status": "UNLOADING"}`|
+| PUT   | /container/api/v1/update/1 | Update Container | Content-Type: application/json| `{"id": 1, "code": "DFG", "status": "OTHER"}`         | 400 Bad Request | `{"timestamp": "...", "status": 400, "error": "Bad Request", "message": "...", "path": "/container/api/v1/update/1"}` |
+| PUT   | /container/api/v1/update/5 | Update Container | Content-Type: application/json| `{"id": 5, "code": "DFG", "status": "PICKED_UP"}`     | 404 Not Found   | |
+
+#### Endpoint Delete Container example
+Container register
 {
-    "code": "ABC",
-    "status": "other"
+"id": 1,
+"code": "ABC",
+"status": "UNLOADING"
 }
 
-Response
-{
-    "timestamp": "...",
-    "status": 400,
-    "error": "Bad Request",
-    "message": "...",
-    "path": "..."
-}
-```
-
-#### API get detail container
-GET 200 Ok
-```
-exist container id
-
-Request
-localhost:8080/container/api/v1/detail/1
-
-
-Response
-{
-    "id": 1,
-    "code": "ABC",
-    "status": "CUSTOMS_CLEARANCE"
-}
-```
-
-GET 404 Not Found
-```
-no exist container id
-
-Request
-localhost:8080/container/api/v1/detail/1
-
-Response: 404 Not Found
-```
-
-#### API list containers
-GET 200 Ok
-```
-exist containers
-
-Request
-localhost:8080/container/api/v1/containers
-
-
-Response
-[
-    {
-        "id": 1,
-        "code": "ABC",
-        "status": "UNLOADING"
-    },
-    {
-        "id": 2,
-        "code": "ABC",
-        "status": "PICKED_UP"
-    }
-]
-```
-
-GET 200 Ok
-```
-no exist containers
-
-Request
-localhost:8080/container/api/v1/containers
-
-Response
-[]
-```
+| Method | Endpoint                   | Description      | Response Status |
+|--------|----------------------------|------------------|-----------------|
+| DELETE | /container/api/v1/delete/1 | Delete Container | 204 Not Content |
+| DELETE | /container/api/v1/delete/5 | Delete Container | 404 Not Found   |
 
 ### To Run Test
 ```sh
