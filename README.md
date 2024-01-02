@@ -107,7 +107,7 @@ After run access to (http://localhost:8080/api-route)
 |--------|--------------------------|--------------------------------|------------------------------------|--------------------------------------------|---------------------------|-------------------------------------------------------------------------------------------------------------------------------|
 | POST   | /container/api/v1/create | Create Container               | Content-Type: application/json| ```{"code": "ABC", "status": "PICKED_UP"}``` | 201 Created               | `{"id": 1, "code": "ABC", "status": "PICKED_UP"}`                                                                             |
 | POST    | /container/api/v1/create | Create Container               | Content-Type: application/json| `{"code": "ABC", "status": "OTHER"}`       | 400 Bad Request           | `{"timestamp": "...", "status": 400, "error": "Bad Request", "message": "...", "path": "/container/api/v1/create"}`           |
-| POST    | /container/api/v1/create | Create Container - null fields | Content-Type: application/json| `{"code": "ABC"}`     | 500 Internal Server Error | `{"timestamp": "...", "status": 500, "error": "Internal Server Error", "message": "...", "path": "/container/api/v1/create"}` |
+| POST    | /container/api/v1/create | Create Container - null fields | Content-Type: application/json| `{"code": "ABC"}`     | 400 Bad Request  |  |
 
 
 #### Endpoint Detail Container example
