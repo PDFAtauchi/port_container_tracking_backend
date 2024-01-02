@@ -86,12 +86,28 @@ public class ContainerControllerTests {
         @Test
         void shouldReturnBadRequest400WhenCreatingInvalidObject() throws Exception {
             // Given
-            given(containerService.createContainer(any(Container.class))).willThrow(new RuntimeException("Error"));
+            given(containerService.createContainer(any(Container.class)))
+                    .willThrow(new RuntimeException("Unexpected error for create container"));
 
             // When
             ResultActions response = mockMvc.perform(post(serviceCreateUrl)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(""));
+
+            // Then
+            response.andExpect(status().isBadRequest());
+        }
+
+        @Test
+        void shouldReturnBadRequest400WhenCreatingObjectWithNullFields() throws Exception {
+            // Given
+            given(containerService.createContainer(any(Container.class)))
+                    .willThrow(new IllegalArgumentException("Error in arguments"));
+
+            // When
+            ResultActions response = mockMvc.perform(post(serviceCreateUrl)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{}"));
 
             // Then
             response.andExpect(status().isBadRequest());
