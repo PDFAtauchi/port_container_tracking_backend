@@ -94,6 +94,19 @@ public class ContainerControllerITests extends AbstractionContainerBaseTests {
             // Then
             response.andExpect(status().isBadRequest());
         }
+
+        @Test
+        void shouldReturnBadRequest400WhenCreatingObjectWithNullFields() throws Exception {
+            // Given
+
+            // When
+            ResultActions response = mockMvc.perform(post(serviceCreateUrl)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{}"));
+
+            // Then
+            response.andExpect(status().isBadRequest());
+        }
     }
 
     @Nested

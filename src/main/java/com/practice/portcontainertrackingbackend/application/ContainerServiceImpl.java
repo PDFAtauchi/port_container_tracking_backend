@@ -20,6 +20,9 @@ public class ContainerServiceImpl implements ContainerService {
 
     @Override
     public Container createContainer(Container container) {
+        if (container.getCode() == null || container.getStatus() == null) {
+            throw new IllegalArgumentException("Error in arguments");
+        }
         return containerRepository.save(container);
     }
 

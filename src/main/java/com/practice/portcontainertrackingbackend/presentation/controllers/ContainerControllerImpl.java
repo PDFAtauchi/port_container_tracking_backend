@@ -27,8 +27,16 @@ public class ContainerControllerImpl implements ContainerControllers {
 
     @Override
     public ResponseEntity<Container> createOrder(Container container) {
-        Container containerCreated = containerService.createContainer(container);
-        return new ResponseEntity<>(containerCreated, HttpStatus.CREATED);
+        try {
+            Container containerCreated = containerService.createContainer(container);
+            return new ResponseEntity<>(containerCreated, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            log.error("Bad request for create container", e);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            log.error("Unexpected error for create container", e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
