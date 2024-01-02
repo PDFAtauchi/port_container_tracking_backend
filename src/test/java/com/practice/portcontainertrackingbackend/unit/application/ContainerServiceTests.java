@@ -64,7 +64,8 @@ public class ContainerServiceTests {
             // When createContainer
 
             // Then
-            assertThatThrownBy(() -> containerRepository.save(container)).isInstanceOf(RuntimeException.class);
+            assertThatThrownBy(() -> containerService.createContainer(container))
+                    .isInstanceOf(RuntimeException.class);
             verify(containerRepository, times(1)).save(container);
         }
 
