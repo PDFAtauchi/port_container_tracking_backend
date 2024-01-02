@@ -101,42 +101,14 @@ POSTGRES_PASSWORD=db-password
 ```
 After run access to (http://localhost:8080/api-route)
 ### API usage
-#### API create container
-POST 201 Created
-```
-localhost:8080/container/api/v1/create
-Request
-{
-    "code": "ABC",
-    "status": "CUSTOMS_CLEARANCE"
-}
+#### Endpoint Create Container example
 
-Response
-{
-    "id": 1,
-    "code": "ABC",
-    "status": "CUSTOMS_CLEARANCE"
-}
-```
+| Method | Endpoint                 | Description                    | Request Headers                   | Request Body (Example)                     | Response Status           | Response Body (Example)                                                                                                       |
+|--------|--------------------------|--------------------------------|------------------------------------|--------------------------------------------|---------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| POST   | /container/api/v1/create | Create Container               | Content-Type: application/json| ```{"code": "ABC", "status": "PICKED_UP"}``` | 201 Created               | `{"id": 1, "code": "ABC", "status": "PICKED_UP"}`                                                                             |
+| POST    | /container/api/v1/create | Create Container               | Content-Type: application/json| `{"code": "ABC", "status": "OTHER"}`       | 400 Bad Request           | `{"timestamp": "...", "status": 400, "error": "Bad Request", "message": "...", "path": "/container/api/v1/create"}`           |
+| POST    | /container/api/v1/create | Create Container - null fields | Content-Type: application/json| `{"code": "ABC"}`     | 500 Internal Server Error | `{"timestamp": "...", "status": 500, "error": "Internal Server Error", "message": "...", "path": "/container/api/v1/create"}` |
 
-POST 400 Bad Request
-```
-localhost:8080/container/api/v1/create
-Request
-{
-    "code": "ABC",
-    "status": "other"
-}
-
-Response
-{
-    "timestamp": "...",
-    "status": 400,
-    "error": "Bad Request",
-    "message": "...",
-    "path": "..."
-}
-```
 
 #### Endpoint Detail Container example
 container register
